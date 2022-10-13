@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<style>
+header {
+  background-color:  #B0C4DE;
+  padding: 30px;
+  text-align: center;
+  font-size: 35px;
+  color: white;
+}
+
+</style>
+</head>
+
+<body> 
+<h1> Hw1 Helper</h1>
+<button id='power'>Power</button>
+<div id='bkgd' style="position:absolute; top: 27vh; left: 45vw; width:185px; height:550px; border-radius: 80px; "></div>
+
+
+<header>
+	<img src="tree3.jpg" style="center" alt="Trulli" width="700" height="900">
+</header>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+var powerOn = true;
+
+$('#power').click (function() {
+  powerOn = !powerOn;
+  
+  if (powerOn === true) {  // false--> true
+     lamps.forEach (function(item) {item.startBlink();});
+  }
+});
+
+class Lamp {
+
+  constructor(name) {
+    this.name = name + Lamp.id++;
+    this.myStatus = false;
+    
+    let el = document.createElement ('div');
+    el.id = this.name;
+    let text = document.createTextNode (name + ' is OFF');
+    el.appendChild(text);
+    let bkgd = document.getElementById('bkgd');
+    bkgd.appendChild(el);
+    this.hue = Math.random()*360;
+
+     // styles
+    el.setAttribute ("style", `background-color: hsl(${this.hue}, 90%, 50%); width:30px;height:30px;border-radius:80px;`);
+    this.left = Math.random()*0.8;
+    this.top = Math.random()*0.8;
+    el.style.position = "absolute";
+    el.style.left = this.left*100 + '%'; 
+    el.style.top = this.top*100 + '%';
+	//el.style.radom=
+  }
+
+  toggle() {
+    this.myStatus = ! this.myStatus;
+    this.change=Math.floor((Math.random() * 100) + 150);
+	
+    if (powerOn) {
+       setTimeout (()=>{this.toggle();}, this.change);
+    
+      if (this.myStatus === true) {
+        $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,80%)`);
+        $('#'+this.name).text('');
+      } else {
+        $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,24%)`);
+        $('#'+this.name).text('');
+      }
+    }else{
+	   $('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,24%)`);
+	   $('#'+this.name).text('');
+    }
+  }
+
+  startBlink() {
+    var that = this;
+/*   
+    setInterval(function() {
+      that.toggle();
+    }, 500);
+*/
+   setTimeout (()=>{ this.toggle(); }, 0);
+     
+    //setInterval (that.toggle, 500);   // somehow, it does not work
+  }
+}
+
+
+Lamp.id = 0; // class variable
+lamps = [];
+
+for (let i = 0; i < 15; i++) {
+   let ll = new Lamp ('light');
+   lamps.push (ll);
+}
+
+lamps.forEach ( function(ll) {ll.startBlink();} );
+
+</script>
+</body>
+
+</html>
+<!--
+Footer
+© 2022 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+3W3D/hw1demo.html at master · jyunming-chen/3W3D
+-->
