@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<style>
+html, body {
+  width: 1000px;
+  height: 1000px;
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  background-color: #D9D4CF;
+}
+.grid-container {
+  display: grid;
+  grid-template-areas:
+    'v_vector vw_cal'
+    'w_vector vw_cal';
+  background-color:#D9D4CF;
+  row-gap: 15px;
+  column-gap: 30px;
+  padding: 40px;
+}
+input{
+  padding: 12px;
+  display: inline-block;
+  border: 3px solid #6E7783;
+  border-radius: 4px;
+  box-sizing: border-box;
+  text-align: center;
+}
+ label { 
+  font-size:30px;
+}
+form {
+  text-align: center;
+}
+.v{
+	width:450px; 
+	height:450px; 
+	float:left;
+	padding:10px;
+	font-size:2vw;
+	border-radius: 50px; 
+	background-color:#ABD0CE;
+	border:5px #7C7877 dashed;
+	border='1'
+	cellpadding="10"
+}
+.w{
+	width:450px; 
+	height:450px; 
+	float:left; 
+	padding:10px;
+	font-size:2vw;
+	border-radius: 50px; 
+	background-color:#ABD0CE;
+	border:5px #7C7877 dashed;
+	border='1'
+	cellpadding="10"
+
+}
+
+.product{
+	width:450px; 
+	height:900px; 
+	float:right; 
+	padding:10px;
+	font-size:2vw;
+	border-radius: 50px; 
+	background-color:#ABD0CE;
+	border:5px #7C7877 dashed;
+	border='1'
+	cellpadding="10"
+}
+.blank{
+	width:450px; 
+	height:20px; 
+	float:left; 
+	border-radius: 50px; 
+	background-color:#D9D4CF;
+}
+
+hr {
+  border: none;
+  height: 3px;
+  background: #778899;
+}
+</style>
+<body bgcolor=#D9D4CF>
+<h1> Hw2 - HTML Input & Vector3 API</h1>
+<!--
+<div id='bkgd' style="position:absolute; top: 27vh; left: 45vw; width:185px; height:550px; border-radius: 80px; "></div>
+<div <td><a href="Index.html">回到Index頁面</a>-->
+
+
+<div class="v">
+  <form>
+	<label>v<br>______________<br></label>
+	<label>x:</label>
+	<input type="text" id="v_x" onblur="cal();"> <br><br>
+	<label>y:</label>
+	<input type="text" id="v_y" onblur="cal();">	<br><br>
+	<label>z:</label>
+	<input type="text" id="v_z" onblur="cal();">
+  </form>
+</div>
+
+<div class="product">
+    <form>
+	  <label>inner product<br>______________<br></label>
+      <input type="text" id="v_w"> <br><br><br><br><br>
+      <p>v . w<br>______________<br> </p>
+      <label>x </label><input id="p_x"><br>
+      <label>y </label><input id="p_y"><br>
+      <label>z </label><input id="p_z">
+
+    </form>
+  </div>
+
+ <div class="w">
+    <form>
+	<label>w<br>______________<br></label>
+	<label>x:</label>
+	<input type="text" id="w_x" onblur="cal();"> <br><br>
+	<label>y:</label>
+	<input type="text" id="w_y" onblur="cal();">	<br><br>
+	<label>z:</label>
+	<input type="text" id="w_z" onblur="cal();">
+	
+    </form>
+  </div>
+  
+  
+    
+
+
+
+<script src="https://threejs.org/build/three.min.js"></script>
+<script>
+function cal(){
+    var x1 = parseFloat(document.getElementById('v_x').value);
+    var x2 = parseFloat(document.getElementById('w_x').value);
+    var y1 = parseFloat(document.getElementById('v_y').value);
+    var y2 = parseFloat(document.getElementById('w_y').value);
+    var z1 = parseFloat(document.getElementById('v_z').value);
+    var z2 = parseFloat(document.getElementById('w_z').value);
+	const v = new THREE.Vector3(x1, y1, z1);
+	const w = new THREE.Vector3(x2, y2, z2);
+
+	const r1 = v.clone ();
+	var ans_a = r1.dot(w);
+	const r2 = v.clone ();
+	var ans_b = r2.cross(w);
+
+	document.getElementById('v_w').value = ans_a;
+	document.getElementById('p_x').value = ans_b.x;
+	document.getElementById('p_y').value = ans_b.y;
+	document.getElementById('p_z').value = ans_b.z;
+}
+</script>
+</body>
+</html>
