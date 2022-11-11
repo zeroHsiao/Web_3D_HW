@@ -1,0 +1,548 @@
+<!--HTML-------------------------->
+<div id="floor">Art Gellary Map
+</div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js">
+</script>
+<script src="http://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
+
+
+<div id="wall"></div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+
+<div id="chair"></div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<!--CSS------------------>
+<style>
+<!--floor-->
+#floor {
+  position: absolute;
+  top: 1%;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffee12;
+}
+style
+body {
+  overflow: hidden;
+}
+<!--wall-->
+#wall {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+
+<!--chair-->
+#chair_size {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+
+
+</style>
+<!--Java------------------>
+<script>
+<!--floor-->
+var renderer, scene, camera;
+var texture, mesh;
+var keyboard = new KeyboardState();
+var useMipmap = false;
+
+init();
+animate();
+
+function init() {
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
+  
+  camera.position.y = 1000;//500
+  camera.position.z = 1000;//500
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0xaaaaaa);
+
+  document.body.appendChild(renderer.domElement);
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  //////////////////////////////////////////////////////////
+  let loader = new THREE.TextureLoader()
+  loader.crossOrigin = '';
+
+  texture = loader.load('https://i.imgur.com/qDqOVvk.jpg');
+  var seaTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+  //var conTex = loader.load('https://i.imgur.com/pZHBC5u.jpg');
+  var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+  
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+	texture.repeat.set(10, 10);
+  
+  mesh = new THREE.Mesh(new THREE.PlaneGeometry(1500, 1500), 
+  	new THREE.MeshBasicMaterial({map: texture}))
+  mesh.rotation.x = -Math.PI / 2;
+  scene.add(mesh);
+  <!---wall------------------------------------------------------->
+eyeCamera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 1, 1000);
+  var gridXZ = new THREE.GridHelper(1500, 30, 'red', 'white');
+  scene.add(gridXZ);
+//fence-----------------
+  var fence_1 = new THREE.Mesh(new THREE.BoxGeometry(10, 300, 1500), new THREE.MeshLambertMaterial({map:conTex}));
+  fence_1.position.set(0, 150, -750);
+  fence_1.rotation.y = Math.PI/2;
+  var fence_2 = new THREE.Mesh(new THREE.BoxGeometry(10, 300, 1500), new THREE.MeshLambertMaterial());
+  fence_2.position.set(0, 150, 750);
+  fence_2.rotation.y = Math.PI/2;
+  var fence_3 = new THREE.Mesh(new THREE.BoxGeometry(10, 300, 1500), new THREE.MeshLambertMaterial());
+  fence_3.position.set(750, 150, 0);
+  var fence_4 = new THREE.Mesh(new THREE.BoxGeometry(10, 300, 1500), new THREE.MeshLambertMaterial());
+  fence_4.position.set(-750, 150, 0);
+//Sea Area----------------
+  var sea_1 = new THREE.Mesh(new THREE.BoxGeometry(1, 300, 500), new THREE.MeshLambertMaterial({map:seaTexture}));
+  sea_1.position.set(-500, 150, -739);
+  sea_1.rotation.y = Math.PI/2;
+  var sea_2 = new THREE.Mesh(new THREE.BoxGeometry(1, 300, 600), new THREE.MeshLambertMaterial({map:seaTexture}));
+  sea_2.position.set(-739, 150, -450);
+  
+  var sea_3 = buildwall_1 ();
+  var sea_4 = buildwall_2 ();
+  scene.add (sea_1,sea_2,sea_3,sea_4);
+
+//sky Area----------------
+  var sky_1 = new THREE.Mesh(new THREE.BoxGeometry(1, 300, 600), new THREE.MeshLambertMaterial({map:seaTexture}));
+  sky_1.position.set(-739, 150, 450);
+  var sky_2 = new THREE.Mesh(new THREE.BoxGeometry(1, 300, 600), new THREE.MeshLambertMaterial({map:seaTexture}));
+  sky_2.position.set(-450, 150, 739);
+  sky_2.rotation.y = Math.PI/2;
+  
+  var sky_3 = buildwall_3 ();
+  var sky_4 = buildwall_4 ();
+  var sky_5 = buildwall_5 ();
+  var sky_6 = buildwall_6 ();
+  var sky_7 = buildwall_7 ();
+  var sky_8 = buildwall_8 ();
+  scene.add (sky_1,sky_2,sky_3,sky_4,sky_5,sky_6,sky_7,sky_8);
+  
+  //test
+  /*
+  var wall_2 = new THREE.Mesh(new THREE.BoxGeometry(10, 300, 300), new THREE.MeshLambertMaterial());
+  wall_2.position.set(500, 150, 0);
+  wall_2.rotation.y = Math.PI/2;
+  */
+  var wall = new THREE.Mesh(new THREE.BoxGeometry(10, 300, 500), new THREE.MeshLambertMaterial());
+  wall.position.set(740, 150, 500);//wall.position.set(305, 150, 0);
+  //畫框
+   var drawing_1 = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), 
+	new THREE.MeshBasicMaterial({ color: "pink"}));
+  drawing_1.position.set(729, 170, 500);//drawing.position.set(299, 170, 0);
+  drawing_1.rotation.y = -Math.PI / 2;
+   var drawing_2 = new THREE.Mesh(new THREE.PlaneGeometry(350, 160), 
+	new THREE.MeshBasicMaterial({ color: "pink"}));
+  drawing_2.position.set(500, 170, -740);//drawing.position.set(299, 170, 0);
+   var drawing_3 = new THREE.Mesh(new THREE.PlaneGeometry(200, 160), 
+	new THREE.MeshBasicMaterial({ color: "pink"}));
+  drawing_3.position.set(20, 170, -240);
+  var drawing_4 = new THREE.Mesh(new THREE.PlaneGeometry(400, 200), 
+	new THREE.MeshBasicMaterial({ color: "pink"}));
+  drawing_4.position.set(189, 170, -500);//drawing.position.set(299, 170, 0);
+  drawing_4.rotation.y = -Math.PI / 2;
+  var drawing_5 = new THREE.Mesh(new THREE.PlaneGeometry(400, 200), 
+	new THREE.MeshBasicMaterial({ color: "pink"}));
+  drawing_5.position.set(69, 170, 500);//drawing.position.set(299, 170, 0);
+  drawing_5.rotation.y = -Math.PI / 2;
+  var drawing_6 = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), 
+	new THREE.MeshBasicMaterial({ color: "pink"}));
+  drawing_6.position.set(-419, 170, 570);//drawing.position.set(299, 170, 0);
+  drawing_6.rotation.y = -Math.PI / 2;
+  var drawing_7 = new THREE.Mesh(new THREE.PlaneGeometry(300, 160), 
+	new THREE.MeshBasicMaterial({ color: "pink"}));
+  drawing_7.position.set(-500, 170, -735);
+  
+  
+  
+  scene.add(fence_1,fence_2,fence_3,fence_4);
+  scene.add(wall);
+  scene.add(drawing_1,drawing_2,drawing_3,drawing_4,drawing_5);
+  scene.add(drawing_6,drawing_7);//,drawing_3,drawing_4,drawing_5);
+
+  
+  eyeCamera.position.set(0, 170, 0);
+  eyeCamera.lookAt(300, 500, 0);
+  
+  //////////////
+  // lighting
+  //圓點
+  const pointLight_1 = new THREE.PointLight(0xffffff, 1);
+  pointLight_1.position.set(600, 300, 500);
+  const pointLight_2 = new THREE.PointLight(0xffffff, 1);
+  pointLight_2.position.set(450, 300, -700);
+  const pointLight_3 = new THREE.PointLight(0xffffff, 1);
+  pointLight_3.position.set(600, 300, 500);
+  const pointLight_4 = new THREE.PointLight(0xffffff, 1);
+  pointLight_4.position.set(450, 300, -700);
+  const pointLight_5 = new THREE.PointLight(0xffffff, 1);
+  pointLight_5.position.set(600, 300, 500);
+  const pointLight_6 = new THREE.PointLight(0xffffff, 1);
+  pointLight_6.position.set(450, 300, -700);
+  const pointLight_7 = new THREE.PointLight(0xffffff, 1);
+  pointLight_7.position.set(600, 300, 500);
+
+  scene.add(pointLight_1,pointLight_2,pointLight_3,pointLight_4,pointLight_5,pointLight_6,pointLight_7);
+
+  const sphereSize = 3;
+  const pointLightHelper_1 = new THREE.PointLightHelper(pointLight_1, sphereSize);
+  const pointLightHelper_2 = new THREE.PointLightHelper(pointLight_2, sphereSize);
+  const pointLightHelper_3 = new THREE.PointLightHelper(pointLight_3, sphereSize);
+
+  const pointLightHelper_4 = new THREE.PointLightHelper(pointLight_4, sphereSize);
+    ///*
+  const pointLightHelper_5 = new THREE.PointLightHelper(pointLight_5, sphereSize);
+  const pointLightHelper_6 = new THREE.PointLightHelper(pointLight_6, sphereSize);
+  const pointLightHelper_7 = new THREE.PointLightHelper(pointLight_7, sphereSize);
+  //*/
+  scene.add(pointLightHelper_1,pointLightHelper_2,pointLightHelper_3,pointLightHelper_4,pointLightHelper_5,pointLightHelper_6,pointLightHelper_7);
+  //網狀
+	//spotLight
+  spotLight_1 = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight_1.position.set(600, 300, 500);//(729, 170, 500)
+  spotLight_1.target = drawing_1;
+  spotLight_2 = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight_2.position.set(450, 300, -700);//(500, 170, -740)
+  spotLight_2.target = drawing_2;
+  spotLight_3 = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight_3.position.set(0, 300, -200);//(20, 170, -240)
+  spotLight_3.target = drawing_3;
+  spotLight_4 = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight_4.position.set(89, 300, -530);//(189, 170, -500)
+  spotLight_4.target = drawing_4;
+  spotLight_5 = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight_5.position.set(0, 300, 480);//(69, 170, 500)
+  spotLight_5.target = drawing_5;
+  spotLight_6 = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight_6.position.set(-500, 300, 550);//(-419, 170, 570)
+  spotLight_6.target = drawing_6;
+  spotLight_7 = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight_7.position.set(-500, 300, -600);//(-500, 170, -735)
+  spotLight_7.target = drawing_7;
+  
+  
+  
+  scene.add(spotLight_1,spotLight_2,spotLight_3,spotLight_4,spotLight_5,spotLight_6,spotLight_7);
+	//spotLightHelper
+  spotLightHelper_1 = new THREE.SpotLightHelper(spotLight_1);
+  spotLightHelper_2 = new THREE.SpotLightHelper(spotLight_2);
+  spotLightHelper_3 = new THREE.SpotLightHelper(spotLight_3);
+  spotLightHelper_4 = new THREE.SpotLightHelper(spotLight_4);
+  spotLightHelper_5 = new THREE.SpotLightHelper(spotLight_5);
+  spotLightHelper_6 = new THREE.SpotLightHelper(spotLight_6);
+  spotLightHelper_7 = new THREE.SpotLightHelper(spotLight_7);
+  scene.add(spotLightHelper_1,spotLightHelper_2,spotLightHelper_3,spotLightHelper_4,spotLightHelper_5,spotLightHelper_6,spotLightHelper_7);
+  
+  /*
+  //圓點
+  const pointLight = new THREE.PointLight(0xffffff, 1);
+  pointLight.position.set(600, 300, 500);
+  scene.add(pointLight);
+
+  const sphereSize = 3;
+  const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+  scene.add(pointLightHelper);
+  */
+  //網狀
+  /*
+  spotLight = new THREE.SpotLight(0xffffff, 1, 250, Math.PI / 6, 0.974);
+  spotLight.position.set(450, 300, -730);
+  spotLight.target = drawing_2;
+  scene.add(spotLight);
+
+  spotLightHelper = new THREE.SpotLightHelper(spotLight);
+  scene.add(spotLightHelper);
+  */
+  
+  var chair = buildChair();
+  var chair1 = chair.clone();
+  chair1.position.set (500, 0, -300);
+  var chair2 = chair.clone();
+  chair2.position.set (-280, 0, -600);
+  chair2.rotation.y = Math.PI/2;
+  var chair3 = chair.clone();
+  chair3.position.set (300, 0, 550);
+  chair3.rotation.y = Math.PI/2;
+  var chair4 = chair.clone();
+  chair4.position.set (-200, 0, 600);
+  chair4.rotation.y = Math.PI/2;
+  var chair5 = chair.clone();
+  chair5.position.set (-200, 0, 500);
+  chair5.rotation.y = Math.PI/2;
+  /*
+  var chair3 = chair.clone();
+  chair3.position.set (-200, 0, 550);
+  chair3.rotation.y = Math.PI/2;
+  var chair4 = chair.clone();
+  chair4.position.set (300, 0, 600);
+  chair4.rotation.y = Math.PI/2;
+  var chair5 = chair.clone();
+  chair5.position.set (300, 0, 500);
+  chair5.rotation.y = Math.PI/2;
+  */
+  scene.add (chair1,chair2,chair3,chair4,chair5);
+}
+
+function animate() {
+
+  requestAnimationFrame(animate);
+  render();
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+<!--六面-->
+function buildwall_1 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 590);//(30, 60,60);
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:conTex});
+   let mNx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(-150, 150, -300);
+   
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-150, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv);//tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildwall_2 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 380);//(30, 60,60);
+   
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNx = new THREE.MeshBasicMaterial({map:conTex});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});//右側
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});//下面
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(-550, 150, -0);
+   tv.rotation.y = Math.PI/2;
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-255, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildwall_3 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 350);//(30, 60,60);
+   
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNx = new THREE.MeshBasicMaterial({map:conTex});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});//右側
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});//下面
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(-400, 150,570);
+   //tv.rotation.y = Math.PI/2;
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-255, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildwall_4 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 700);//(30, 60,60);
+   
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNx = new THREE.MeshBasicMaterial({map:conTex});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});//右側
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});//下面
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(-400, 150,260);
+   tv.rotation.y = Math.PI/2;
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-255, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildwall_5 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 500);//(30, 60,60);
+   
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNx = new THREE.MeshBasicMaterial({map:conTex});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});//右側
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});//下面
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(80, 150,500);
+   //tv.rotation.y = Math.PI/5;
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-255, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv, screen);//tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildwall_6 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 700);//(30, 60,60);
+   
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNx = new THREE.MeshBasicMaterial({map:conTex});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});//右側
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});//下面
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(200, 150,0);
+   tv.rotation.y = Math.PI/2;
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-255, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildwall_7 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 580);//(30, 60,60);
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:conTex});
+   let mNx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(200, 150, -460);
+   
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-150, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv);//tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildwall_8 () {
+   var tvGroup = new THREE.Group();
+   var tvGeom = new THREE.BoxGeometry (20, 300, 340);//(30, 60,60);
+   
+   var materials = [];
+   
+   var loader = new THREE.TextureLoader();
+   var wallTexture = loader.load("https://i.imgur.com/8i0ueBu.jpg");
+   var conTex = loader.load('https://i.imgur.com/GUgdJL8.jpg');
+   let mPx = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNx = new THREE.MeshBasicMaterial({map:conTex});
+   let mPy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mNy = new THREE.MeshBasicMaterial({map:wallTexture});
+   let mPz = new THREE.MeshBasicMaterial({map:conTex});//右側
+   let mNz = new THREE.MeshBasicMaterial({map:wallTexture});//下面
+   //mPx.visible = false;
+     materials.push (mPx, mNx, mPy, mNy, mPz, mNz);
+   var tv = new THREE.Mesh (tvGeom, materials);
+   tv.position.set(25, 150, -260);
+   tv.rotation.y = Math.PI/2;
+   var screen = new THREE.Mesh (new THREE.PlaneGeometry (600,300),//(100,100)//
+   new THREE.MeshBasicMaterial({map:conTex}));
+   screen.position.set (-255, 150,-450);
+   screen.rotation.y = Math.PI/2;
+   
+   tvGroup.add (tv, screen);
+   return tvGroup;
+}
+function buildChair() {
+  var group = new THREE.Group();
+  var woodTex = new THREE.TextureLoader().load("https://i.imgur.com/DrvlmNW.jpg?1");
+  var mat = new THREE.MeshLambertMaterial({
+    map: woodTex
+  });
+  var boxTop = new THREE.Mesh(new THREE.BoxGeometry(100, 10, 30), mat);
+  var boxLeg1 = new THREE.Mesh(new THREE.BoxGeometry(10, 50, 30), mat);
+  var boxLeg2 = new THREE.Mesh(new THREE.BoxGeometry(10, 50, 30), mat);
+  boxTop.position.set(0, 45, 0);
+  boxLeg1.position.set(-45, 15, 0);
+  boxLeg2.position.set(45, 15, 0);
+  group.add(boxTop, boxLeg1, boxLeg2);
+  return group;
+}
+</script>
