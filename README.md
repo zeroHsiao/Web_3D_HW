@@ -9,6 +9,6 @@
 
 HOMEWORK¡G
 
-- [hw1 - Xmas Lights with HTML & CSS](https://zeroHsaio.github.io/Web_3D_HW/XmasLights.html)
-- [hw2 - Hw2 - HTML Input & Vector3 API](https://zeroHsaio.github.io/Web_3D_HW/vectorProduct.html)
-- [hw2 - Hw3 - Art Gellary Design Model](https://zeroHsaio.github.io/Web_3D_HW/ArtGellaryDesignModel.html)
+- [hw1 - Xmas Lights with HTML & CSS](https://zeroHsaio.github.io/Web_3D_HW/hw1/XmasLights.html)
+- [hw2 - Hw2 - HTML Input & Vector3 API](https://zeroHsaio.github.io/Web_3D_HW/hw2/vectorProduct.html)
+- [hw2 - Hw3 - Art Gellary Design Model](https://zeroHsaio.github.io/Web_3D_HW/hw3/ArtGellaryDesignModel.html)
