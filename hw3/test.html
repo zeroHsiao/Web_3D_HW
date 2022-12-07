@@ -1,0 +1,335 @@
+<div id="info">Blended Floor</div>
+<h1 style="font-size:2em; text-align:center; margin:15px">
+  Place, Delete
+</h1>
+
+<hr>
+
+<div id="container"></div>
+
+<div style="width:30vw;float:left; margin:10px;background-color:yellow">
+  <input type=radio class='gclass' id='placing' name='g' value='place' checked> Place <br>
+  <input type=radio class='gclass' name='g' value='delete'> Delete<br>
+  <p id='debugMsg'>
+  </p>
+</div>
+
+<div style="float:left; margin-left: 10px; width:32vw;">
+
+  <div>
+    Sphere radius:
+    <input id="radius" type="range" min=3 max=30 value=5>
+    <span id='radiusPrint'>
+</span>
+    <br>
+  </div>
+  <br>
+  <div style='background-color:pink'>
+    Color Selector:
+    <br>
+    <input type=radio name='c' value='red'>red
+    <input type=radio name='c' value='blue'>blue
+    <input type=radio name='c' value='green'>green
+  </div>
+  <br>
+  <button id='clear' style="width:45%">Clear</button>
+  <button id='save' style="width:45%">Save</button>
+  <button id='restore' style="width:45%">Restore</button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+
+<style>
+#info {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+
+body {
+  overflow: hidden;
+}
+#container {
+  width: 60vw;
+  height: 60vw;
+  float: left;
+  background-color: pink;
+  margin: 10px;
+}
+
+p {
+  margin: 10px;
+  text-align: justify;
+}
+
+
+
+
+</style>
+<script>
+
+$('.gclass').click(function() {
+  if ($(this).val() === 'place')
+    placing = true;
+  else // delete
+    placing = false;
+});
+
+$('#radius').change(function() {
+  $('#radiusPrint').text($(this).val());
+});
+
+var controls;
+//var pickplane;
+var cyl;
+var spheres = [];
+
+var scene, renderer, camera;
+var plane;
+var puck;
+var mouse = new THREE.Vector2();
+var raycaster = new THREE.Raycaster();
+var placing = true;
+var pucks = [];
+init();
+animate();
+
+$('#clear').click(function() {
+
+  spheres.forEach(function(sphere) {
+    scene.remove(sphere);
+  });
+  spheres = [];
+
+});
+
+$('#save').click(function() {
+
+  var states = [];
+  spheres.forEach(function(sphere) {
+    states.push(sphere.name);
+  });
+
+  localStorage.setItem('stateStr', JSON.stringify(states));
+
+});
+
+$('#restore').click(function() {
+
+  var states = JSON.parse(localStorage.getItem('stateStr'));
+  states.forEach(function(stateStr) {
+    console.log(stateStr);
+    var state = JSON.parse(stateStr);
+    buildSphere(state.rad, new THREE.Vector3(state.pos[0], 0, state.pos[1]));
+  });
+
+});
+
+function buildSphere(rad, pos) {
+
+  var sphere = new THREE.Mesh(new THREE.SphereGeometry(rad, 20, 20), new THREE.MeshNormalMaterial());
+
+  scene.add(sphere);
+  var prop = {
+    rad: rad,
+    pos: [pos.x, pos.z]
+  };
+  console.log(prop);
+  sphere.name = JSON.stringify(prop);
+  console.log(sphere.name);
+
+  spheres.push(sphere);
+  sphere.position.copy(pos);
+
+}
+
+
+function init() {
+
+  scene = new THREE.Scene();
+
+	renderer = new THREE.WebGLRenderer({
+    antialias: true
+  });
+  var ww = $('#container').innerWidth();
+  var hh = $('#container').innerHeight();
+  renderer.setSize(ww, hh);
+  renderer.setClearColor(0x555555);
+  $('#container').append(renderer.domElement);
+/*
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+  document.body.appendChild(renderer.domElement);
+*/
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(45, ww / hh, 1, 10000);
+  camera.position.set(0, 80, 200);
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+  
+  var cyl_geom = new THREE.CylinderGeometry(10, 10, 6, 32);
+  var cyl_mat = new THREE.MeshNormalMaterial();
+  puck = new THREE.Mesh(cyl_geom, cyl_mat);
+ //=================================================
+/* 
+ cyl = new THREE.Mesh(cyl_geom, cyl_mat);
+  cyl.rotation.x = -Math.PI / 2;
+  cyl.position.set(-20, 0, 20);
+  scene.add(cyl);
+  */
+//=================================================
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+  ////////////////////////////////////////////////////////
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+  //scene.add(gridXZ);
+  
+  var loader = new THREE.TextureLoader();
+  var floorGroup = new THREE.Group();
+  var grassMap = loader.load ('https://i.imgur.com/ADGE9Ix.jpg');
+  var grassAlpha = loader.load ('https://i.imgur.com/mGdIosi.png?1');
+  var grassFloor = new THREE.Mesh (new THREE.PlaneGeometry (300,300), new THREE.MeshBasicMaterial({map: grassMap, transparent:true, alphaMap: grassAlpha}));
+
+  var stoneMap = loader.load ('https://i.imgur.com/T1ZbCDb.jpg');
+  var stoneAlpha = loader.load ('https://i.imgur.com/D9alJjG.png');
+	var stoneFloor = new THREE.Mesh (new THREE.PlaneGeometry (300,300), new THREE.MeshBasicMaterial({map: stoneMap, transparent:true, alphaMap: stoneAlpha}));
+  floorGroup.add (grassFloor, stoneFloor);
+  scene.add (floorGroup);
+  
+  floorGroup.rotation.x = -Math.PI/2;
+  
+  plane = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry(200, 200, 8, 8),
+    new THREE.MeshBasicMaterial({
+      color: 0xFFFAFA,
+      opacity: 0.25,
+      transparent: true
+    }));
+  plane.rotation.x = -Math.PI / 2;
+  plane.material.visible = false; // invisible, for picking only
+  scene.add(plane);
+
+  window.addEventListener('resize', onWindowResize, false);
+  //window.addEventListener('mousemove', onDocumentMouseMove, false);
+  //window.addEventListener('mousedown', onDocumentMouseDown, false);
+  $('#container').on("pointerdown", onMouseDown);
+  $('#container').on("pointerup", onMouseUp);
+
+}
+function onWindowResize() {
+  var ww = $('#container').innerWidth();
+  var hh = $('#container').innerHeight();
+  camera.aspect = ww / hh;
+  camera.updateProjectionMatrix();
+  renderer.setSize(ww, hh);
+}
+
+function onMouseDown(event) {
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  if (placing === true) { // place
+    var intersects = raycaster.intersectObject(plane);
+    if (intersects.length > 0) {
+      var newPuck = puck.clone();
+      newPuck.position.copy(intersects[0].point);
+      scene.add(newPuck);
+      pucks.push(newPuck);
+    }
+  } else { // delete
+    var intersects = raycaster.intersectObjects(pucks);
+    if (intersects.length > 0) {
+      thePuck = intersects[0].object;
+
+      //scene.remove(thePuck);
+      thePuck.removeFromParent();
+
+      // remove thePuck from pucks
+      for (let i = 0; i < pucks.length; i++) {
+        if (pucks[i] === thePuck) {
+          pucks.splice(i, 1);
+          break;
+        }
+      }
+
+    }
+
+  }
+
+}
+
+function onMouseUp(event) {
+
+  if (pucks.length === 0) {
+    placing = true;
+    $('#placing').prop('checked', true);
+    // https://stackoverflow.com/questions/15044340/jquery-set-checkbox-checked
+  }
+  
+  $('#debugMsg').text(pucks.length + ' pucks on plane');
+
+}
+
+/*
+function onDocumentMouseMove(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(pickplane);
+  if (intersects.length > 0) {
+    cyl.position.copy(intersects[0].point);
+    cyl.position.y = 2;
+  }
+}
+
+function onDocumentMouseDown(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(pickplane);
+  if (intersects.length > 0) {
+    cyl.position.copy(intersects[0].point);
+    buildSphere(10, intersects[0].point);
+  }
+}
+
+*/
+function animate() {
+
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+
+}
+/*
+function animate() {
+
+  controls.update();
+  requestAnimationFrame(animate);
+  render();
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+*/
+</script>
