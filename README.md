@@ -9,7 +9,7 @@
 
 HOMEWORK¡G
 
-- [hw1 - Xmas Lights with HTML & CSS](https://zeroHsaio.github.io/Web_3D_HW/hw1/XmasLights.html)
+- [hw1 - Xmas Lights with HTML & CSS](https://zerohsaio.github.io/Web_3D_HW/hw1/XmasLights.html)
 - [hw2 - HTML Input & Vector3 API](https://zerohsiao.github.io/Web_3D_HW/hw2/vectorProduct.html)
-- [hw3 - Art Gellary Design Model](https://zeroHsaio.github.io/Web_3D_HW/hw3/ArtGellaryDesignModel.html)
-- [hw4 - Patio Design](https://zeroHsaio.github.io/Web_3D_HW/hw4/PatioDesign.html)
+- [hw3 - Art Gellary Design Model](https://zerohsaio.github.io/Web_3D_HW/hw3/ArtGellaryDesignModel.html)
+- [hw4 - Patio Design](https://zerohsaio.github.io/Web_3D_HW/hw4/PatioDesign.html)
