@@ -1,0 +1,69 @@
+<html>
+<head>
+	<title>Three.js app</title>
+</head>
+<body>
+		
+
+<div id="container" style="margin-top: 20px; height: 400px; width: 400px; border: solid 1px gray;"></div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+var scene, camera, renderer;
+var disc;
+var theta;
+
+init();
+animate();
+
+function getPos () {
+	// Call api 
+	// Need to be replaced by a public ip address
+	$.get( "http://127.0.0.1:1337/api?K=4&t="+ theta, function( data ) {
+		if(data && data.output){
+			var coords = data.output.split (" ");
+			disc.position.set (10*coords[0], 10*coords[1], 0.0);
+			//console.log (theta + ": " + coords[0] + ", " + coords[1]);
+		}
+	});
+}
+
+function init() {
+
+	scene = new THREE.Scene();
+	let ww = $('#container').width();
+	let hh = $('#container').height();
+	camera = new THREE.OrthographicCamera( -15,15,15,-15, -1, 100 );
+	
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize (ww, hh);
+	
+	renderer.setClearColor( 0xcacaca, 1);
+	$("#container").append( renderer.domElement );
+	camera.position.z = 5;
+	scene.add (new THREE.AxesHelper (12));
+
+    ///////////////////////////////////////////////////
+	disc = new THREE.Mesh (new THREE.CircleGeometry(1, 10), new THREE.MeshBasicMaterial());
+	theta = 0;
+	scene.add(disc);
+
+}
+
+function animate() {
+
+	theta += 0.01;
+	requestAnimationFrame( animate );
+
+	getPos(); // should use setInterval (unless the Shell does not respond as fast
+	
+	renderer.render(scene, camera);
+
+}
+
+
+
+</script>
+</body>
+</html>

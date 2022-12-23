@@ -1,0 +1,114 @@
+<html>
+<head>
+	<title>Three.js app</title>
+</head>
+
+<body>
+		
+<div style="margin: 10px;">
+	<input id="num" value="1" style="width:30px;"> ! 	
+	<button id="btn" style="margin: 0 4px;">=</button>
+	<span id="resultSpan"></span>
+</div>
+<div id="container" style="margin-top: 20px; height: 400px; width: 400px; border: solid 1px gray;"></div>
+
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+
+$('#num').change ( function() {
+   console.log ( $(this).val() ) ; // test & verify
+});
+
+$("#btn").click(function(){
+	var num = parseInt($("#num").val(), 10);
+	let result = "";
+	var max = 5;
+
+	if(num > max) {
+		alert("input too large number! must < "+max);
+		$("#num").val(max);
+		num = max;
+	}
+
+	// Call api: Need to be replaced by a public ip address
+	$.get( "http://127.0.0.1:1337/api?argv="+ num, function( data ) {
+		if(data && data.output){
+			result = parseInt(data.output, 10);
+			$("#resultSpan").text(result);
+
+			obj.remove(shape);
+			createShape(result);
+		}
+	});
+
+
+});
+
+var scene, camera, renderer;
+var obj = new THREE.Object3D();
+var shape;
+var result;
+
+init();
+animate();
+
+function init() {
+	scene = new THREE.Scene();
+	let ww = $('#container').width();
+	let hh = $('#container').height();
+	camera = new THREE.PerspectiveCamera( 100, ww/hh, 1, 1000 );
+	
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize (ww, hh);
+	
+	renderer.setClearColor( 0xcacaca, 1);
+	$("#container").append( renderer.domElement );
+	camera.position.z = 5;
+	
+	///////////////////////
+	createShape(1);
+	scene.add(obj);
+	$("#resultSpan").text("1");
+	
+}
+
+function createShape (segments){
+	var darkMaterial = new THREE.MeshBasicMaterial( { color: 'papayawhip' } );
+	var wireframeMaterial = new THREE.MeshBasicMaterial( 
+	                       { color: 'black', wireframe: true} ); 
+	var multiMaterial = [ darkMaterial, wireframeMaterial ]; 
+
+	shape = createMultiMaterialObject( 
+	  new THREE.SphereGeometry( 2, segments, segments ), multiMaterial );
+
+	obj.add(shape);
+}
+
+//https://github.com/mrdoob/three.js/blob/dev/examples/jsm/utils/SceneUtils.js#L113
+function createMultiMaterialObject( geometry, materials ) {
+
+	const group = new THREE.Group();
+	for ( let i = 0, l = materials.length; i < l; i ++ ) {
+		group.add( new THREE.Mesh( geometry, materials[ i ] ) );
+  }
+	return group;
+
+}
+
+function animate() {
+	requestAnimationFrame( animate );
+
+	obj.rotation.x += 0.01;
+	obj.rotation.y += 0.01;
+
+	renderer.render(scene, camera);
+	
+}
+
+
+
+</script>
+</body>
+</html>

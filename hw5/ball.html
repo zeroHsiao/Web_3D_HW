@@ -1,0 +1,114 @@
+<div id="info">hw5 helper</div>
+<script src="https://threejs.org/build/three.min.js"></script>
+
+
+<style>
+#info {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+
+body {
+  overflow: hidden;
+}
+</style>
+
+<script>
+
+var camera, scene, renderer;
+var circle, pos, pos_2, vel, vel_2, rectangle;
+
+init();
+animate();
+
+function init() {
+
+  scene = new THREE.Scene();
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+  document.body.appendChild(renderer.domElement);
+
+  camera = new THREE.OrthographicCamera(-100, 100, 100, -100, -100, 100);
+  camera.position.z = 50;
+
+  ////////////////////////////////////////////////////////
+  var gridXZ = new THREE.GridHelper(160, 20, 'red', 'white');
+  gridXZ.rotation.x = Math.PI / 2;
+  scene.add(gridXZ);
+
+  let geometry = new THREE.BufferGeometry();
+  let points = [];
+  points.push(
+    new THREE.Vector3(-80, -80, 0),
+    new THREE.Vector3(80, -80, 0),
+    new THREE.Vector3(80, 80, 0),
+    new THREE.Vector3(-80, 80, 0),
+    new THREE.Vector3(-80, -80, 0));
+  geometry.setFromPoints(points);
+  var border = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+    color: 'blue'
+  }));
+  scene.add(border);
+
+  circle = new THREE.Mesh(new THREE.CircleGeometry(10, 20, 20), new THREE.MeshBasicMaterial({
+    color: 'yellow'
+  }));
+  scene.add(circle);
+
+  rectangle = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshBasicMaterial({
+    color: 'purple'
+  }));
+  /*
+  rectangle = new THREE.Raycaster(ew THREE.PlaneGeometry(20, 20), new THREE.MeshBasicMaterial({
+    color: 'purple'
+  }));
+  */
+  scene.add(rectangle);
+  
+  pos = new THREE.Vector3();
+  pos_2 = new THREE.Vector3();
+  vel = new THREE.Vector3(10, 20);
+  vel_2 = new THREE.Vector3(10, 10);
+  
+}
+
+function animate() {
+  var dt = 0.05;
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+
+  pos.add(vel.clone().multiplyScalar(dt));
+  if (pos.x > 70 || pos.x < -70)
+    vel.x *= -1;
+  if (pos.y > 70 || pos.y < -70)
+    vel.y *= -1;
+	
+  pos_2.add(vel_2.clone().multiplyScalar(0.05));
+  if (pos_2.x > 70 || pos_2.x < -70)
+    vel_2.x *= -1;
+	else 
+	vel_2.x *= 1;
+  //if (pos_2.y > 70 || pos_2.y < -70)
+    vel_2.y = 1;
+
+  if (pos.x > 0)
+    circle.material.color.set('cyan');
+  else
+    circle.material.color.set('yellow');
+	
+
+  if (pos.x > 0)
+    rectangle.material.color.set('green');
+  else
+    rectangle.material.color.set('purple');
+
+  circle.position.copy(pos);
+  rectangle.position.copy(pos_2);
+}
+</script>
