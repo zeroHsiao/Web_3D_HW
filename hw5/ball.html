@@ -1,5 +1,18 @@
-<div id="info">hw5 helper</div>
+<h1 style="font-size:2em; text-align:center; margin:15px">
+  collide
+</h1>
 <script src="https://threejs.org/build/three.min.js"></script>
+
+<div style="float:right; margin: 20px; width:32vw;">
+
+  <div>
+    Radius:
+    <input id="radius" type="range" min=3 max=30 value=5>
+    <span id='radiusPrint'>
+</span>
+
+	<div id="word">
+	state
 
 
 <style>
@@ -9,18 +22,33 @@
   width: 100%;
   padding: 10px;
   text-align: center;
-  color: #ffff00
+  color:#483D8B
 }
 
 body {
-  overflow: hidden;
+  width: 100pw;
+  height:100pw;
+}
+#container {
+  width: 60vw;
+  height: 60vw;
+  float: left;
+  background-color: pink;
+  margin: 10px;
+}
+
+place{
+	width:450px; 
+	height:450px;
 }
 </style>
 
 <script>
 
+
 var camera, scene, renderer;
 var circle, pos, pos_2, vel, vel_2, rectangle;
+var test=1;
 
 init();
 animate();
@@ -30,7 +58,10 @@ function init() {
   scene = new THREE.Scene();
 
   renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+  //var ww = $('#container').innerWidth();
+  //var hh = $('#container').innerHeight();
+  //$('#container').append(renderer.domElement);
   renderer.setClearColor(0x888888);
   document.body.appendChild(renderer.domElement);
 
@@ -71,6 +102,13 @@ function init() {
   */
   scene.add(rectangle);
   
+  /*
+	if (pos_2)
+	 $('#word').text( 'collison');
+	else
+	$('#word').text('nothing');
+	*/
+  
   pos = new THREE.Vector3();
   pos_2 = new THREE.Vector3();
   vel = new THREE.Vector3(10, 20);
@@ -92,17 +130,22 @@ function animate() {
   pos_2.add(vel_2.clone().multiplyScalar(0.05));
   if (pos_2.x > 70 || pos_2.x < -70)
     vel_2.x *= -1;
-	else 
-	vel_2.x *= 1;
-  //if (pos_2.y > 70 || pos_2.y < -70)
-    vel_2.y = 1;
+	//else 
+	//vel_2.x *= 1;
+  if (pos_2.y > 5 || pos_2.y < 5)
+    vel_2.y = 0;
 
-  if (pos.x > 0)
+	if (pos.x > 0)
     circle.material.color.set('cyan');
-  else
+	else if (vel.x==vel_2.x && vel.y==vel_2.y){
+		test=1;
+		circle.material.color.set('purple');
+		}
+	else{
+	test=0;
     circle.material.color.set('yellow');
+	}
 	
-
   if (pos.x > 0)
     rectangle.material.color.set('green');
   else
